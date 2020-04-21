@@ -12,8 +12,8 @@ protocol BluetoothManagerDelegate: AnyObject {
 protocol BluetoothManager {
     var peripherals: Dictionary<UUID, CBPeripheral> { get }
     var delegate: BluetoothManagerDelegate? { get set }
-    func startAdvertising(with name: String)
-    func startScanning()
+    var uuid: String { get }
+    func covidStart()
 }
 
 class CoreBluetoothManager: NSObject, BluetoothManager {
@@ -24,8 +24,27 @@ class CoreBluetoothManager: NSObject, BluetoothManager {
             delegate?.peripheralsDidUpdate()
         }
     }
+    public var uuid: String {
+        get {
+            return self.createUuid()
+        }
+    }
 
     // MARK: - Public methods
+    
+    override init() {
+        super.init()
+    }
+    
+    func createUuid() -> String  {
+        return UUID().uuidString
+    }
+    
+    func covidStart() {
+        startAdvertising(with: uuid)
+        startScanning()
+    }
+    
     func startAdvertising(with name: String) {
         self.name = name
         peripheralManager = CBPeripheralManager(delegate: self, queue: nil)
